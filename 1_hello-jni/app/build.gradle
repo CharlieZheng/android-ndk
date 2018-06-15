@@ -1,13 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     defaultConfig {
         applicationId 'com.example.hellojni'
-        minSdkVersion 23
-        targetSdkVersion 25
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        ndk {
+            abiFilters "x86"
+        }
     }
     buildTypes {
         release {
@@ -58,6 +61,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:25.4.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 }

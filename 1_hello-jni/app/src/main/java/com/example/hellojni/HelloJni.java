@@ -15,12 +15,16 @@
  */
 package com.example.hellojni;
 
+import android.support.annotation.Keep;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class HelloJni extends AppCompatActivity {
-
+private Button btn ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +34,35 @@ public class HelloJni extends AppCompatActivity {
          */
         setContentView(R.layout.activity_hello_jni);
         TextView tv = (TextView)findViewById(R.id.hello_textview);
+         btn = (Button) findViewById(R.id.btn);
         tv.setText( stringFromJNI() );
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                HelloJni.this.onClick();
+            }
+        });
     }
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
     public native String  stringFromJNI();
+    public native void  onClick();
 
+@Keep
+    private void onClick2() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                btn.setEnabled(false);
+                btn.setText("调用了");
+            }
+        });
+       Log.v(HelloJni.class.getName(), "Hello World!");
+    }
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
      * you can declare as many native methods in your Java code
@@ -49,6 +74,7 @@ public class HelloJni extends AppCompatActivity {
      * java.lang.UnsatisfiedLinkError exception !
      */
     public native String  unimplementedStringFromJNI();
+
 
     /* this is used to load the 'hello-jni' library on application
      * startup. The library has already been unpacked into

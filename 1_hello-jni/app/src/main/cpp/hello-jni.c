@@ -23,6 +23,10 @@
  *
  *   hello-jni/app/src/main/java/com/example/hellojni/HelloJni.java
  */
+#include <android/log.h>
+static const char* kTAG = "hello-jniCallback";
+#define LOGE(...)\
+  ((void)__android_log_print(ANDROID_LOG_ERROR, kTAG, __VA_ARGS__))
 JNIEXPORT jstring JNICALL
 Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env,
                                                   jobject thiz )
@@ -61,3 +65,57 @@ Java_com_example_hellojni_HelloJni_stringFromJNI( JNIEnv* env,
 
     return (*env)->NewStringUTF(env, "Hello from JNI !  Compiled with ABI " ABI ".");
 }
+/*
+ 写法一
+ */
+
+JNIEXPORT void JNICALL
+Java_com_example_hellojni_HelloJni_onClick( JNIEnv* env,
+                                                  jobject thiz )
+{
+
+
+    jobject  obj = (*env)->NewGlobalRef(env, thiz);
+    // 开始：methodId
+    // 获取clz方式一：
+//    jclass clz = (*env)->FindClass(env, "com/example/hellojni/HelloJni");
+    // 获取clz方式二：
+    jclass clz=(*env)->GetObjectClass(env, thiz);
+    jmethodID methodId = (*env)->GetMethodID(env, clz, "onClick2", "()V");
+    // 结束：methodId
+    (*env)->CallVoidMethod(env, obj, methodId); // 调用方法
+    (*env)->DeleteGlobalRef(env, obj); // 垃圾回收
+
+}
+
+
+/*
+ 写法二：
+ 这种写法在Activity中调用findViewById将出错
+ 出错原因暂时不知晓
+ */
+/*
+JNIEXPORT void JNICALL
+Java_com_example_hellojni_HelloJni_onClick( JNIEnv* env,
+                                            jobject thiz )
+{
+
+
+    // 开始：methodId
+    jclass clz = (*env)->FindClass(env, "com/example/hellojni/HelloJni");
+
+    jclass  classInstance  =(*env)->NewGlobalRef(env, clz);
+    jmethodID constructor = (*env)->GetMethodID(env, classInstance, "<init>", "()V"); // 构造方法
+    jobject  objPre = (*env)->NewObject(env, classInstance, constructor);
+
+    jobject  obj = (*env)->NewGlobalRef(env, objPre);
+    // 结束：methodId
+    jmethodID methodId = (*env)->GetMethodID(env, classInstance, "onClick2", "()V"); // 构造方法
+    (*env)->CallVoidMethod(env, obj, methodId); // 调用方法
+    (*env)->DeleteLocalRef(env, objPre); // 垃圾回收
+    (*env)->DeleteGlobalRef(env, obj); // 垃圾回收
+    (*env)->DeleteGlobalRef(env, classInstance); // 垃圾回收
+    LOGE("%d",
+         __LINE__);
+}
+*/
